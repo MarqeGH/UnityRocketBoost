@@ -8,15 +8,14 @@ public class Rocket : MonoBehaviour
 {
     
     private GameObject playerObj = null;
+    AudioSource audioSource;
     Rigidbody player;
 
-    public GameObject levelStart = null;
-    GameObject levelEnd = null;
+    GameObject levelStart = null;
 
     [SerializeField] float angleSpeed = 30f;
     
     [SerializeField] float rocketSpeed = 30f;
-    int bugCounter = 0;
 
 
     Vector3 tilt;
@@ -26,34 +25,16 @@ public class Rocket : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-        if (playerObj == null)
-        {
-            playerObj = GameObject.Find("Player");
-        }
-        player = playerObj.GetComponent<Rigidbody>();
-
-        if (levelStart == null)
-        {
-            levelStart = GameObject.Find("LaunchPad");
-        }
-        if (levelEnd == null)
-        {
-            levelEnd = GameObject.Find("LandingPad");
-        }
-
-        startPosition = levelStart.transform.position;
+        FindObjects();
         SpawnPlayer();
     }
+
+    
 
     // Update is called once per frame
     void Update()
     {
         tilt = new Vector3(0, 0, -Input.GetAxisRaw("Horizontal"));
-        if (Input.GetKeyDown("r"))
-        {
-            ResetLevel();
-        }
     }
     void FixedUpdate()
     {
@@ -62,37 +43,39 @@ public class Rocket : MonoBehaviour
 
     void MovePlayer (){
         tilt = tilt*Time.deltaTime;
-        Quaternion newTilt = Quaternion.Euler(tilt);
+        //Quaternion newTilt = Quaternion.Euler(tilt);
 
          // player.MoveRotation(player.rotation*newTilt);
         player.AddTorque(tilt*angleSpeed, ForceMode.Acceleration);
         if (Input.GetKey(KeyCode.Space))
         {
             player.AddForce(transform.up*rocketSpeed);
-            Debug.Log("You are creating space");
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+        }
+        if (!Input.GetKey(KeyCode.Space))
+        { 
+            audioSource.Pause();
         }
     }
-    private void OnCollisionEnter(Collision other)
-    {
-        if(other.gameObject.tag == "Hazard")
-        {
-            ResetLevel();
-        }
-        if (other.gameObject.name == "LandingPad")
-        {
-            NextLevel();
-        }
-    } 
+
     
-
-    void ResetLevel()
-        {
-            Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);
-        }
-
-    public void NextLevel()
+    private void FindObjects()
     {
-       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (playerObj == null)
+        {
+            playerObj = GameObject.Find("Player");
+        }
+        player = playerObj.GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
+
+        if (levelStart == null)
+        {
+            levelStart = GameObject.Find("LaunchPad");
+            startPosition = levelStart.transform.position;
+        }
     }
 
     void SpawnPlayer()
