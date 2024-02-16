@@ -2119,7 +2119,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2513491856520820440, guid: fbc120615ad29449eb0f60c8804f9436, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.782205
+      value: 8.8668375
       objectReference: {fileID: 0}
     - target: {fileID: 2513491856520820440, guid: fbc120615ad29449eb0f60c8804f9436, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2283,6 +2283,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LandingPad
       objectReference: {fileID: 0}
+    - target: {fileID: 6001837401919159592, guid: 3a1b3fcdab4b54240ae99fbb198ab188, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2323,7 +2327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6843611875227169444, guid: 7e2b47a594beb4a718353295c8b67299, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.782205
+      value: 8.8668375
       objectReference: {fileID: 0}
     - target: {fileID: 6843611875227169444, guid: 7e2b47a594beb4a718353295c8b67299, type: 3}
       propertyPath: m_LocalPosition.y

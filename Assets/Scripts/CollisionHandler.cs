@@ -13,6 +13,8 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] AudioClip crashSound;
     [SerializeField] AudioClip victorySound;
     [SerializeField] float timeToNextLevel = 2f;
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem crashParticles;
 
     int currentSceneIndex;
     int sceneCount;
@@ -99,6 +101,7 @@ public class CollisionHandler : MonoBehaviour
     void VictorySequence()
     {
         isCrashed = true;
+        successParticles.Play();
         player.GetComponent<Rocket>().enabled = false;
         playerAudio.Stop();
         audioSource.PlayOneShot(victorySound);
@@ -106,6 +109,7 @@ public class CollisionHandler : MonoBehaviour
     }
     void CrashSequence()
     {
+        crashParticles.Play();      
         isCrashed = true;
         player.GetComponent<Rocket>().enabled = false;
         playerAudio.Stop();
