@@ -21,7 +21,7 @@ public class Rocket : MonoBehaviour
 
     [SerializeField] float angleSpeed = 30f;
     [SerializeField] float rocketSpeed = 30f;
-
+    bool isBoosting;
     Vector3 tilt;
     Vector3 startPosition;
 
@@ -39,57 +39,84 @@ public class Rocket : MonoBehaviour
     void Update()
     {
         tilt = new Vector3(0, 0, -Input.GetAxisRaw("Horizontal"));
+        PlayerEffects();
     }
     void FixedUpdate()
     {
         MovePlayer();
     }
 
-    void MovePlayer (){
-        tilt = tilt*Time.deltaTime;
-        //Quaternion newTilt = Quaternion.Euler(tilt);
 
-         // player.MoveRotation(player.rotation*newTilt);
-        player.AddTorque(tilt*angleSpeed, ForceMode.Acceleration);
+    void PlayerEffects()
+    {
+        HorizontalBoost();
+        if (Input.GetKey(KeyCode.Space))
+        {
+            ThrusterEngage();
+            isBoosting = true;
+        }
+        if (!Input.GetKey(KeyCode.Space))
+        {
+            ThrusterDisable();
+            isBoosting = false;
+        }
+    }
+    void MovePlayer()
+    {
+        tilt = tilt * Time.deltaTime;
+        //Quaternion newTilt = Quaternion.Euler(tilt);
+        if(isBoosting)
+        {
+            player.AddForce(transform.up * rocketSpeed);
+        }
+        // player.MoveRotation(player.rotation*newTilt);
+        player.AddTorque(tilt * angleSpeed, ForceMode.Acceleration);
+    }
+    void HorizontalBoost()
+    {
         if (Input.GetKey(KeyCode.D))
         {
-            leftBoost.Play();
+            rightBoost.Emit(1000);
         }
-        else {
-            leftBoost.Stop();
+        else
+        {
+            rightBoost.Stop();
         }
         if (Input.GetKey(KeyCode.A))
         {
-            rightBoost.Play();
+            leftBoost.Emit(100);
         }
-        else {
-            rightBoost.Stop();
-        }
-        if (Input.GetKey(KeyCode.Space))
+        else
         {
-            player.AddForce(transform.up*rocketSpeed);
-            
-            foreach (ParticleSystem item in mainBoosters)
-            {
-                item.Play();
-            }
-            if (!audioSource.isPlaying)
-            {
-                audioSource.Play();
-            }
+            leftBoost.Stop();
         }
-        if (!Input.GetKey(KeyCode.Space))
-        { 
-            audioSource.Pause();
-            foreach (ParticleSystem item in mainBoosters)
-            {
-                item.Stop();
-            }
+    }
+    void ThrusterEngage()
+    {
+        foreach (ParticleSystem item in mainBoosters)
+        {
+            item.Emit(100);
+        }
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
         }
     }
 
+    void ThrusterDisable()
+    {
+        audioSource.Pause();
+        foreach (ParticleSystem item in mainBoosters)
+        {
+            item.Stop();
+        }
+    }
+
+
+
     
-    private void FindObjects()
+
+    void FindObjects()
     {
         if (playerObj == null)
         {

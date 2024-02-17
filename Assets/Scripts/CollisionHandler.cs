@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
 
-    GameObject player;
+    GameObject player; 
     AudioSource audioSource;
     AudioSource playerAudio;
     [SerializeField] AudioClip crashSound;
@@ -20,6 +20,7 @@ public class CollisionHandler : MonoBehaviour
     int sceneCount;
     
     bool isCrashed = false;
+    bool collisionsDisabled = false;
     
     void Start()
     {
@@ -35,14 +36,26 @@ public class CollisionHandler : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("r"))
-        {
-            ResetLevel();
-        }
+        CheatCodes();
         // if (!Input.GetKey(KeyCode.Space) & audioSource.clip != victorySound)
         // { 
         //     audioSource.Pause();
         // }
+    }
+
+    void CheatCodes(){
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetLevel();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            NextLevel();
+        }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            HandleCollisions();
+        }
     }
 
     // IEnumerator WaitAndPrint() Return WaitForSeconds value of 5
@@ -63,7 +76,7 @@ public class CollisionHandler : MonoBehaviour
     }
     void OnCollisionEnter(Collision other)
     {
-        if (isCrashed) { return; }
+        if (isCrashed || collisionsDisabled) { return; }
 
         switch (other.gameObject.tag)
         {
@@ -96,6 +109,10 @@ public class CollisionHandler : MonoBehaviour
     void ResetLevel()
     {
         SceneManager.LoadScene(currentSceneIndex);
+    }
+    void HandleCollisions()
+    {
+        collisionsDisabled = !collisionsDisabled;
     }
 
     void VictorySequence()
