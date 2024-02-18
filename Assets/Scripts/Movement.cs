@@ -22,15 +22,24 @@ public class Rocket : MonoBehaviour
     [SerializeField] float angleSpeed = 30f;
     [SerializeField] float rocketSpeed = 30f;
     bool isBoosting;
+    bool boostDisabled = false;
     Vector3 tilt;
     Vector3 startPosition;
 
+    [SerializeField] float fuelCap = 100f;
+    float fuelHalf;
+    [SerializeField] float fuelFill = 40f;
+    [SerializeField] float fuelCost = 25f;
+    
+    public float fuel;
 
     // Start is called before the first frame update
     void Start()
     {
         FindObjects();
         SpawnPlayer();
+        fuel = fuelCap;
+        fuelHalf = fuelCap/2;
     }
 
     
@@ -40,43 +49,68 @@ public class Rocket : MonoBehaviour
     {
         tilt = new Vector3(0, 0, -Input.GetAxisRaw("Horizontal"));
         PlayerEffects();
+        FuelLevels();
     }
     void FixedUpdate()
     {
         MovePlayer();
     }
 
-
+    void MovePlayer()
+    {
+        //Quaternion newTilt = Quaternion.Euler(tilt);
+        if(isBoosting && !boostDisabled)
+        {
+            player.AddForce(transform.up * rocketSpeed);
+        }
+        // player.MoveRotation(player.rotation*newTilt);
+        player.AddTorque(tilt*Time.deltaTime * angleSpeed, ForceMode.Acceleration);
+    }
     void PlayerEffects()
     {
         HorizontalBoost();
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && !boostDisabled)
         {
             ThrusterEngage();
             isBoosting = true;
         }
-        if (!Input.GetKey(KeyCode.Space))
+        if (!Input.GetKey(KeyCode.Space) || boostDisabled)
         {
             ThrusterDisable();
             isBoosting = false;
         }
     }
-    void MovePlayer()
+
+    void FuelLevels()
     {
-        tilt = tilt * Time.deltaTime;
-        //Quaternion newTilt = Quaternion.Euler(tilt);
-        if(isBoosting)
+        if (isBoosting && !boostDisabled)
         {
-            player.AddForce(transform.up * rocketSpeed);
+            fuel -= fuelCost * Time.deltaTime;
         }
-        // player.MoveRotation(player.rotation*newTilt);
-        player.AddTorque(tilt * angleSpeed, ForceMode.Acceleration);
+        else
+        {
+            fuel += fuelFill * Time.deltaTime;
+        }
+        fuel = Mathf.Clamp(fuel, 0f, fuelCap);
+        RefillEmpty();
+    }
+
+    private void RefillEmpty()
+    {
+        if (fuel <= 0)
+        {
+            boostDisabled = true;
+        }
+        else if (fuel >= fuelHalf)
+        {
+            boostDisabled = false;
+        }
     }
     void HorizontalBoost()
     {
         if (Input.GetKey(KeyCode.D))
         {
-            rightBoost.Emit(1000);
+            rightBoost.Emit(1);
         }
         else
         {
@@ -84,7 +118,7 @@ public class Rocket : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.A))
         {
-            leftBoost.Emit(100);
+            leftBoost.Emit(1);
         }
         else
         {
@@ -95,7 +129,7 @@ public class Rocket : MonoBehaviour
     {
         foreach (ParticleSystem item in mainBoosters)
         {
-            item.Emit(100);
+            item.Emit(1);
         }
         if (!audioSource.isPlaying)
         {
@@ -111,10 +145,6 @@ public class Rocket : MonoBehaviour
             item.Stop();
         }
     }
-
-
-
-    
 
     void FindObjects()
     {
