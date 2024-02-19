@@ -24,7 +24,6 @@ public class CollisionHandler : MonoBehaviour
     
     void Start()
     {
-        Debug.Log("Starting timer");
         sceneCount = SceneManager.sceneCountInBuildSettings;
         currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         player = GameObject.Find("Player");

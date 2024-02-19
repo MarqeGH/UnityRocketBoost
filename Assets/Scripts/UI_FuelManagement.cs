@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,31 +10,42 @@ public class FuelManagement : MonoBehaviour
     public Image UIfuelFill;
     public Image UIfuelEmpty;
 
+    GameObject focusObject;
+
     GameObject player;
 
-    public float fuelAmount;
+    float fuelAmount;
     float isFull;
 
     void Start()
     {
         FindItems();
+        focusObject = GameObject.Find("Main Camera");
         fuelAmount = player.GetComponent<Rocket>().fuel;
         isFull = fuelAmount;
     }
     void Update()
     {
-        fuelAmount = player.GetComponent<Rocket>().fuel;
-        Debug.Log("FuelMax: " + isFull + " Fuel Total " + fuelAmount);
+        FuelManager();
+    }
 
-        if (fuelAmount != isFull )
+    private void FuelManager()
+    {
+        transform.rotation = Quaternion.LookRotation(transform.position - focusObject.transform.position);
+        fuelAmount = player.GetComponent<Rocket>().fuel;
+
+        if (fuelAmount == isFull)
         {
-            UIfuelFill.fillAmount = UIfuelEmpty.fillAmount-0.1f;
+            UIfuelEmpty.enabled = false;
+            UIfuelFill.enabled = false;
         }
         else 
         {
-            UIfuelFill.fillAmount = UIfuelEmpty.fillAmount;
+            UIfuelEmpty.enabled = true;
+            UIfuelFill.enabled = true;
         }
-        UIfuelEmpty.fillAmount = fuelAmount/100;
+        UIfuelEmpty.fillAmount = fuelAmount / isFull;
+        UIfuelFill.fillAmount = UIfuelEmpty.fillAmount - 0.05f;
     }
 
     void FindItems()
